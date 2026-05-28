@@ -1,16 +1,13 @@
-import draftToHtml from 'draftjs-to-html'
 import { useCallback, useState } from 'react'
 import { Button, Container, Form } from 'react-bootstrap'
-import { Editor } from 'react-draft-wysiwyg'
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
+import Editor from '../../components/editor/Editor'
 import './styles.css'
 const NewBlogPost = (props) => {
   const [text, setText] = useState('')
 
   const handleChange = useCallback((value) => {
-    setText(draftToHtml(value))
+    setText(value)
     console.log(text)
-    // console.log(convertToRaw(value.getCurrentContent()))
   })
 
   return (
@@ -33,7 +30,7 @@ const NewBlogPost = (props) => {
         <Form.Group controlId="blog-content" className="mt-3">
           <Form.Label>Contenuto Blog</Form.Label>
 
-          <Editor value={text} onChange={handleChange} className="new-blog-content" />
+          <Editor />
         </Form.Group>
         <Form.Group className="d-flex mt-3 justify-content-end">
           <Button type="reset" size="lg" variant="outline-dark">

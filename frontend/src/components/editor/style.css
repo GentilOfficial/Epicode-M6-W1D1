@@ -1,0 +1,12 @@
+.editor-wrapper {
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 10px;
+  min-height: 400px;
+  background: white;
+}
+
+.editor-wrapper .ProseMirror {
+  min-height: 400px;
+  outline: none;
+}

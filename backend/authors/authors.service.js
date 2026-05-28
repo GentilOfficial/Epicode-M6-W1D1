@@ -1,7 +1,23 @@
+const BlogPostsSchema = require('../blogPosts/blogPosts.schema')
 const AuthorsSchema = require('./authors.schema')
 
-const getAuthors = async () => {
-  return await AuthorsSchema.find()
+const getAuthors = async (currentPage, pageSize) => {
+  const authors = await AuthorsSchema.find()
+    .limit(pageSize)
+    .skip((currentPage - 1) * pageSize)
+
+  const totalAuthors = await AuthorsSchema.countDocuments()
+  const totalPages = Math.ceil(totalAuthors / pageSize)
+
+  return {
+    pages: {
+      current: Number(currentPage),
+      size: Number(pageSize),
+      totals: totalPages,
+    },
+    count: totalAuthors,
+    authors,
+  }
 }
 
 const getAuthorById = async (id) => {
@@ -22,10 +38,31 @@ const createAuthor = async (author) => {
   return savedAuthor
 }
 
+const getAuthorBlogPosts = async (id, currentPage, pageSize) => {
+  const { email } = await AuthorsSchema.findById(id)
+  const blogPosts = await BlogPostsSchema.find({ author: email })
+    .limit(pageSize)
+    .skip((currentPage - 1) * pageSize)
+
+  const totalAuthorBlogPosts = await BlogPostsSchema.countDocuments({ author: email })
+  const totalPages = Math.ceil(totalAuthorBlogPosts / pageSize)
+
+  return {
+    pages: {
+      current: Number(currentPage),
+      size: Number(pageSize),
+      totals: totalPages,
+    },
+    count: totalAuthorBlogPosts,
+    blogPosts,
+  }
+}
+
 module.exports = {
   getAuthors,
   getAuthorById,
   editAuthorById,
   deleteAuthorById,
   createAuthor,
+  getAuthorBlogPosts,
 }
