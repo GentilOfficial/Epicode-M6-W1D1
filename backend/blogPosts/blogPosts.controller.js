@@ -66,19 +66,6 @@ const createBlogPost = async (req, res) => {
   }
 }
 
-const getBlogPostByTitle = async (req, res) => {
-  try {
-    const { query } = req
-    const blogPost = await blogPostsService.getBlogPostByTitle(query.title)
-    res.status(201).send(blogPost)
-  } catch (e) {
-    res.status(500).send({
-      status: 500,
-      message: 'Error during blogPost creation',
-    })
-  }
-}
-
 module.exports = {
   getBlogPosts,
   getBlogPostById,

@@ -1,38 +1,56 @@
 import { useEffect, useState } from 'react'
-import { Col, Row } from 'react-bootstrap'
+import { Col, Form, Row } from 'react-bootstrap'
+import Pagination from '../../pagination/Pagination'
 import BlogItem from '../blog-item/BlogItem'
 
-const BlogList = (props) => {
+const BlogList = () => {
   const [posts, setPosts] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [searchTitle, setSearchTitle] = useState('')
 
-  const getPosts = async () => {
+  const pageSize = 6
+
+  const getPosts = async (page, title = '') => {
     try {
-      const response = await fetch('http://localhost:4545/blogPosts')
-      const { blogPosts } = await response.json()
-      setPosts(blogPosts)
+      const response = await fetch(
+        `http://localhost:4545/blogPosts?currentPage=${page}&pageSize=${pageSize}&title=${title}`,
+      )
+
+      const data = await response.json()
+
+      setPosts(data.blogPosts)
+      setTotalPages(data.pages.totals)
     } catch (e) {
       console.error(e)
     }
   }
 
   useEffect(() => {
-    getPosts()
-  }, [])
+    getPosts(currentPage, searchTitle)
+  }, [currentPage, searchTitle])
+
+  const handleSearch = (e) => {
+    setSearchTitle(e.target.value)
+    setCurrentPage(1)
+  }
 
   return (
-    <Row>
-      {posts.map((post, i) => (
-        <Col
-          key={`item-${i}`}
-          md={4}
-          style={{
-            marginBottom: 50,
-          }}
-        >
-          <BlogItem key={post.title} {...post} />
-        </Col>
-      ))}
-    </Row>
+    <>
+      <Form.Group className="mb-4">
+        <Form.Control type="text" placeholder="Cerca per titolo..." value={searchTitle} onChange={handleSearch} />
+      </Form.Group>
+
+      <Row>
+        {posts.map((post) => (
+          <Col key={post._id} md={4} style={{ marginBottom: 50 }}>
+            <BlogItem {...post} />
+          </Col>
+        ))}
+      </Row>
+
+      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+    </>
   )
 }
 

@@ -1,5 +1,6 @@
 import { EditorContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import { useEffect } from 'react'
 import { Button, ButtonGroup } from 'react-bootstrap'
 import './style.css'
 
@@ -15,14 +16,20 @@ import {
   TypeStrikethrough,
 } from 'react-bootstrap-icons'
 
-const Editor = () => {
+const Editor = ({ content, setContent }) => {
   const editor = useEditor({
     extensions: [StarterKit],
-    content: '<h1>Titolo</h1><p>Inizia a scrivere il tuo post...</p>',
+    content,
     onUpdate: ({ editor }) => {
-      console.log(editor.getHTML())
+      setContent(editor.getHTML())
     },
   })
+
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content)
+    }
+  }, [content, editor])
 
   if (!editor) return null
 

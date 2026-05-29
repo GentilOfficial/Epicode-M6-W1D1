@@ -1,54 +1,85 @@
 const mongoose = require('mongoose')
 require('mongoose-type-html')
 
-const { Types } = mongoose.Schema
+const { Schema } = mongoose
 
-const readTimeSchema = new mongoose.Schema({
-  _id: false,
-  value: {
-    type: Types.Number,
-    required: true,
-  },
-  unit: {
-    type: Types.String,
-    required: true,
-    maxlength: 4,
-  },
-})
+const readTimeSchema = new Schema(
+  {
+    value: {
+      type: Number,
+      min: 1,
+      required: [true, 'Read time value is required'],
+    },
 
-const BlogPost = new mongoose.Schema(
+    unit: {
+      type: String,
+      enum: ['sec', 'min', 'ore'],
+      required: [true, 'Read time unit is required'],
+    },
+  },
+  { _id: false },
+)
+
+const BlogPostSchema = new Schema(
   {
     category: {
-      type: Types.String,
-      required: true,
-      max: 25,
+      type: String,
+      required: [true, 'Category is required'],
+      minlength: 1,
+      maxlength: 25,
+      trim: true,
     },
+
     title: {
-      type: Types.String,
-      requred: true,
-      max: 50,
+      type: String,
+      required: [true, 'Title is required'],
+      minlength: 3,
+      maxlength: 50,
+      trim: true,
     },
+
     cover: {
-      type: Types.String,
-      required: false,
-      max: 150,
+      type: String,
+      validate: {
+        validator: (value) => {
+          if (!value) return true
+
+          return /^https?:\/\/.+/i.test(value)
+        },
+        message: 'Cover must be a valid URL',
+      },
     },
+
     readTime: {
       type: readTimeSchema,
       required: true,
     },
+
     author: {
-      type: Types.String,
-      required: true,
-      max: 100,
+      type: String,
+      required: [true, 'Author is required'],
+      minlength: 3,
+      maxlength: 100,
+      trim: true,
+
+      validate: {
+        validator: (value) => {
+          return /^\S+@\S+\.\S+$/.test(value)
+        },
+        message: 'Author must be a valid email',
+      },
     },
+
     content: {
       type: mongoose.SchemaTypes.Html,
-      sanitizehtml: true,
-      required: true,
+      sanitizeHtml: true,
+      required: [true, 'Content is required'],
     },
   },
-  { timestamps: true, strict: true },
+  {
+    timestamps: true,
+    strict: true,
+  },
 )
 
-module.exports = mongoose.model('blogPost', BlogPost, 'blogPosts')
+module.exports = mongoose.model('BlogPost', BlogPostSchema)

@@ -3,61 +3,80 @@ import { Container, Image } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router'
 import BlogAuthor from '../../components/blog/blog-author/BlogAuthor'
 import BlogLike from '../../components/likes/BlogLike'
-import posts from '../../data/posts.json'
 import './styles.css'
-const Blog = (props) => {
-  const [blog, setBlog] = useState({})
+
+const Blog = () => {
+  const [blog, setBlog] = useState(null)
   const [loading, setLoading] = useState(true)
+
   const params = useParams()
   const navigate = useNavigate()
 
   useEffect(() => {
-    const { id } = params
-    const blog = posts.find((post) => post._id.toString() === id)
+    const fetchBlog = async () => {
+      try {
+        const { id } = params
 
-    if (blog) {
-      setBlog(blog)
-      setLoading(false)
-    } else {
-      navigate('/404')
+        const res = await fetch(`http://localhost:4545/blogPosts/${id}`)
+
+        if (!res.ok) {
+          navigate('/404')
+          return
+        }
+
+        const data = await res.json()
+        console.log(data)
+        setBlog(data)
+      } catch (err) {
+        console.error(err)
+        navigate('/404')
+      } finally {
+        setLoading(false)
+      }
     }
-  }, [])
+
+    fetchBlog()
+  }, [params.id, navigate])
 
   if (loading) {
     return <div>loading</div>
-  } else {
-    return (
-      <div className="blog-details-root">
-        <Container>
-          <Image className="blog-details-cover" src={blog.cover} fluid />
-          <h1 className="blog-details-title">{blog.title}</h1>
+  }
 
-          <div className="blog-details-container">
-            <div className="blog-details-author">
-              <BlogAuthor {...blog.author} />
-            </div>
-            <div className="blog-details-info">
-              <div>{blog.createdAt}</div>
-              <div>{`lettura da ${blog.readTime.value} ${blog.readTime.unit}`}</div>
-              <div
-                style={{
-                  marginTop: 20,
-                }}
-              >
-                <BlogLike defaultLikes={['123']} onChange={console.log} />
-              </div>
-            </div>
+  return (
+    <div className="blog-details-root">
+      <Container>
+        <Image className="blog-details-cover" src={blog.cover} fluid />
+
+        <h1 className="blog-details-title">{blog.title}</h1>
+
+        <div className="blog-details-category">{blog.category}</div>
+
+        <div className="blog-details-container">
+          <div className="blog-details-author">
+            <BlogAuthor author={blog.author} />
           </div>
 
-          <div
-            dangerouslySetInnerHTML={{
-              __html: blog.content,
-            }}
-          ></div>
-        </Container>
-      </div>
-    )
-  }
+          <div className="blog-details-info">
+            <div>{blog.createdAt}</div>
+
+            <div>
+              lettura da {blog.readTime.value} {blog.readTime.unit}
+            </div>
+
+            <div style={{ marginTop: 20 }}>
+              <BlogLike defaultLikes={['123', '456', '789', '101']} onChange={console.log} />
+            </div>
+          </div>
+        </div>
+
+        <div
+          dangerouslySetInnerHTML={{
+            __html: blog.content,
+          }}
+        />
+      </Container>
+    </div>
+  )
 }
 
 export default Blog

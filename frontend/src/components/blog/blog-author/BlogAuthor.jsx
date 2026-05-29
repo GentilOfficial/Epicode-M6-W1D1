@@ -1,18 +1,11 @@
-import { Col, Image, Row } from 'react-bootstrap'
+import { Col, Row } from 'react-bootstrap'
 import './styles.css'
 
-const BlogAuthor = (props) => {
-  const { name, surname, avatar } = props
+const BlogAuthor = ({ author }) => {
   return (
     <Row>
-      <Col xs={'auto'} className="pe-0">
-        <Image className="blog-author" src={avatar} roundedCircle />
-      </Col>
       <Col>
-        <div>di</div>
-        <h6>
-          {name} {surname}
-        </h6>
+        <small>{author}</small>
       </Col>
     </Row>
   )
