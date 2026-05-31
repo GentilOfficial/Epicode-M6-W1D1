@@ -67,10 +67,6 @@ const NewBlogPost = () => {
       return "L'autore è obbligatorio"
     }
 
-    if (!form.cover.trim()) {
-      return 'Inserisci una copertina'
-    }
-
     if (!form.readTime.value || form.readTime.value <= 0) {
       return 'Inserisci un tempo di lettura valido'
     }
@@ -174,10 +170,9 @@ const NewBlogPost = () => {
           <Form.Control
             name="cover"
             size="lg"
-            placeholder="https://placehold.co/800x600.png"
+            placeholder="https://picsum.photos/600/400"
             value={form.cover}
             onChange={handleInputChange}
-            required
           />
         </Form.Group>
 

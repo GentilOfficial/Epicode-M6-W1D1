@@ -8,13 +8,13 @@ const readTimeSchema = new Schema(
     value: {
       type: Number,
       min: 1,
-      required: [true, 'Read time value is required'],
+      required: true,
     },
 
     unit: {
       type: String,
       enum: ['sec', 'min', 'ore'],
-      required: [true, 'Read time unit is required'],
+      required: true,
     },
   },
   { _id: false },
@@ -24,7 +24,7 @@ const BlogPostSchema = new Schema(
   {
     category: {
       type: String,
-      required: [true, 'Category is required'],
+      required: true,
       minlength: 1,
       maxlength: 25,
       trim: true,
@@ -32,7 +32,7 @@ const BlogPostSchema = new Schema(
 
     title: {
       type: String,
-      required: [true, 'Title is required'],
+      required: true,
       minlength: 3,
       maxlength: 50,
       trim: true,
@@ -40,14 +40,7 @@ const BlogPostSchema = new Schema(
 
     cover: {
       type: String,
-      validate: {
-        validator: (value) => {
-          if (!value) return true
-
-          return /^https?:\/\/.+/i.test(value)
-        },
-        message: 'Cover must be a valid URL',
-      },
+      default: 'https://picsum.photos/600/400',
     },
 
     readTime: {
@@ -57,23 +50,16 @@ const BlogPostSchema = new Schema(
 
     author: {
       type: String,
-      required: [true, 'Author is required'],
+      required: true,
       minlength: 3,
       maxlength: 100,
       trim: true,
-
-      validate: {
-        validator: (value) => {
-          return /^\S+@\S+\.\S+$/.test(value)
-        },
-        message: 'Author must be a valid email',
-      },
     },
 
     content: {
       type: mongoose.SchemaTypes.Html,
       sanitizeHtml: true,
-      required: [true, 'Content is required'],
+      required: true,
     },
   },
   {
@@ -82,4 +68,4 @@ const BlogPostSchema = new Schema(
   },
 )
 
-module.exports = mongoose.model('BlogPost', BlogPostSchema)
+module.exports = mongoose.model('BlogPost', BlogPostSchema, 'blogPosts')
