@@ -1,68 +1,53 @@
 const blogPostsService = require('./blogPosts.service')
 
-const getBlogPosts = async (req, res) => {
+const getBlogPosts = async (req, res, next) => {
   try {
     const { query } = req
     const { currentPage = 1, pageSize = 5 } = query
     const blogPosts = await blogPostsService.getBlogPosts(decodeURIComponent(query.title || ''), currentPage, pageSize)
     res.status(200).send(blogPosts)
   } catch (e) {
-    res.status(500).send({
-      status: 500,
-      message: 'Error during blog posts fetch',
-    })
+    next(e)
   }
 }
 
-const getBlogPostById = async (req, res) => {
+const getBlogPostById = async (req, res, next) => {
   try {
     const { params } = req
     const blogPost = await blogPostsService.getBlogPostById(params.id)
     res.status(200).send(blogPost)
   } catch (e) {
-    res.status(500).send({
-      status: 500,
-      message: 'Error during blog post fetch',
-    })
+    next(e)
   }
 }
 
-const editBlogPostById = async (req, res) => {
+const editBlogPostById = async (req, res, next) => {
   try {
     const { body, params } = req
     const blogPost = await blogPostsService.editBlogPostById(params.id, body)
     res.status(200).send(blogPost)
   } catch (e) {
-    res.status(500).send({
-      status: 500,
-      message: 'Error during blog post creation',
-    })
+    next(e)
   }
 }
 
-const deleteBlogPostById = async (req, res) => {
+const deleteBlogPostById = async (req, res, next) => {
   try {
     const { params } = req
     const blogPost = await blogPostsService.deleteBlogPostById(params.id)
     res.status(200).send(blogPost)
   } catch (e) {
-    res.status(500).send({
-      status: 500,
-      message: 'Error during blog post delete',
-    })
+    next(e)
   }
 }
 
-const createBlogPost = async (req, res) => {
+const createBlogPost = async (req, res, next) => {
   try {
     const { body } = req
     const blogPost = await blogPostsService.createBlogPost(body)
     res.status(201).send(blogPost)
   } catch (e) {
-    res.status(500).send({
-      status: 500,
-      message: 'Error during blogPost creation',
-    })
+    next(e)
   }
 }
 
