@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Container, Image } from 'react-bootstrap'
+import { Badge, Container, Image } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router'
 import BlogAuthor from '../../components/blog/blog-author/BlogAuthor'
 import BlogLike from '../../components/likes/BlogLike'
@@ -49,7 +49,7 @@ const Blog = () => {
 
         <h1 className="blog-details-title">{blog.title}</h1>
 
-        <div className="blog-details-category">{blog.category}</div>
+        <Badge bg="dark">{blog.category}</Badge>
 
         <div className="blog-details-container">
           <div className="blog-details-author">
