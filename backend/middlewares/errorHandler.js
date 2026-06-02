@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
 const HttpException = require('../exceptions/index')
 
-const errorHandler = async (error, req, res, next) => {
+const errorHandler = (error, req, res, next) => {
   if (error instanceof HttpException) {
-    res.status(error.statusCode).send({
+    return res.status(error.statusCode).send({
       code: error.statusCode,
       message: error.message,
       error: error.error,
@@ -11,14 +11,27 @@ const errorHandler = async (error, req, res, next) => {
   }
 
   if (error instanceof mongoose.Error.CastError) {
-    res.status(404).send({
+    return res.status(404).send({
       code: 404,
       message: 'Not found',
       error: 'The requested resourse was not found',
     })
   }
 
-  res.status(500).send({
+  if (error instanceof mongoose.Error.ValidationError) {
+    const errorsMap = Object.entries(error.errors).map((fieldError) => {
+      const [field, props] = fieldError
+      return { [field]: props.message }
+    })
+
+    return res.status(400).send({
+      code: 400,
+      message: 'Error during schema validation',
+      error: errorsMap,
+    })
+  }
+
+  return res.status(500).send({
     code: 500,
     message: 'Internal server error',
     error: 'An internal server error occured, try again later',
