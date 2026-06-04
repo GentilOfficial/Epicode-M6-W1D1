@@ -17,10 +17,10 @@ const BlogList = () => {
         `http://localhost:4545/blogPosts?currentPage=${page}&pageSize=${pageSize}&title=${title}`,
       )
 
-      const data = await response.json()
+      const { pages, data } = await response.json()
 
-      setPosts(data.blogPosts)
-      setTotalPages(data.pages.totals)
+      setPosts(data)
+      setTotalPages(pages.totals)
     } catch (e) {
       console.error(e)
     }

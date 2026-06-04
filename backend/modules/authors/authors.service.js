@@ -1,5 +1,6 @@
 const BlogPostsSchema = require('../blogPosts/blogPosts.schema')
 const AuthorsSchema = require('./authors.schema')
+const paginateResponse = require('../../config/pagination')
 
 const getAuthors = async (currentPage, pageSize) => {
   const authors = await AuthorsSchema.find()
@@ -9,15 +10,7 @@ const getAuthors = async (currentPage, pageSize) => {
   const totalAuthors = await AuthorsSchema.countDocuments()
   const totalPages = Math.ceil(totalAuthors / pageSize)
 
-  return {
-    pages: {
-      current: Number(currentPage),
-      size: Number(pageSize),
-      totals: totalPages,
-    },
-    count: totalAuthors,
-    authors,
-  }
+  return paginateResponse(currentPage, pageSize, totalPages, totalAuthors, authors)
 }
 
 const getAuthorById = async (id) => {
@@ -47,15 +40,7 @@ const getAuthorBlogPosts = async (id, currentPage, pageSize) => {
   const totalAuthorBlogPosts = await BlogPostsSchema.countDocuments({ author: email })
   const totalPages = Math.ceil(totalAuthorBlogPosts / pageSize)
 
-  return {
-    pages: {
-      current: Number(currentPage),
-      size: Number(pageSize),
-      totals: totalPages,
-    },
-    count: totalAuthorBlogPosts,
-    blogPosts,
-  }
+  return paginateResponse(currentPage, pageSize, totalPages, totalAuthorBlogPosts, blogPosts)
 }
 
 module.exports = {

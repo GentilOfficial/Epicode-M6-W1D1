@@ -1,4 +1,5 @@
 const BlogPostsSchema = require('./blogPosts.schema')
+const paginateResponse = require('../../config/pagination')
 
 const getBlogPosts = async (title = '', currentPage, pageSize) => {
   const blogPosts = await BlogPostsSchema.find({
@@ -12,15 +13,7 @@ const getBlogPosts = async (title = '', currentPage, pageSize) => {
   })
   const totalPages = Math.ceil(totalBlogPosts / pageSize)
 
-  return {
-    pages: {
-      current: Number(currentPage),
-      size: Number(pageSize),
-      totals: totalPages,
-    },
-    count: totalBlogPosts,
-    blogPosts,
-  }
+  return paginateResponse(currentPage, pageSize, totalPages, totalBlogPosts, blogPosts)
 }
 
 const getBlogPostById = async (id) => {
