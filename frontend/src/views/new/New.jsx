@@ -7,7 +7,6 @@ const initialFormState = {
   title: '',
   category: '',
   author: '',
-  cover: '',
   readTime: {
     value: 0,
     unit: '',
@@ -20,6 +19,7 @@ const NewBlogPost = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [coverFile, setCoverFile] = useState(null)
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -47,6 +47,10 @@ const NewBlogPost = () => {
       ...form,
       content: value,
     })
+  }
+
+  const handleCoverChange = (e) => {
+    setCoverFile(e.target.files[0])
   }
 
   const resetMessages = () => {
@@ -103,8 +107,25 @@ const NewBlogPost = () => {
         throw new Error('Errore durante la creazione del post')
       }
 
+      const { blogPost } = await response.json()
+
+      if (coverFile) {
+        const formData = new FormData()
+        formData.append('cover', coverFile)
+
+        const uploadResponse = await fetch(`http://localhost:4545/blogPosts/${blogPost._id}/cover`, {
+          method: 'PUT',
+          body: formData,
+        })
+
+        if (!uploadResponse.ok) {
+          throw new Error("Errore durante l'upload della copertina")
+        }
+      }
+
       setSuccess('Post creato correttamente')
       setForm(initialFormState)
+      setCoverFile(null)
     } catch (err) {
       setError(err.message || 'Si è verificato un errore')
     } finally {
@@ -167,13 +188,7 @@ const NewBlogPost = () => {
         <Form.Group className="mt-3">
           <Form.Label>Copertina</Form.Label>
 
-          <Form.Control
-            name="cover"
-            size="lg"
-            placeholder="https://picsum.photos/600/400"
-            value={form.cover}
-            onChange={handleInputChange}
-          />
+          <Form.Control type="file" size="lg" accept="image/*" onChange={handleCoverChange} />
         </Form.Group>
 
         <Form.Group className="mt-3">

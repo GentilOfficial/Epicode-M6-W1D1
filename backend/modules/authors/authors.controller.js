@@ -1,4 +1,5 @@
 const authorsService = require('./authors.service')
+const sendEmail = require('../email/index')
 
 const getAuthors = async (req, res, next) => {
   try {
@@ -31,6 +32,16 @@ const editAuthorById = async (req, res, next) => {
   }
 }
 
+const uploadAuthorAvatar = async (req, res, next) => {
+  try {
+    const { file, params } = req
+    const author = await authorsService.editAuthorById(params.id, { avatar: file.path })
+    res.status(200).send(author)
+  } catch (e) {
+    next(e)
+  }
+}
+
 const deleteAuthorById = async (req, res, next) => {
   try {
     const { params } = req
@@ -45,7 +56,10 @@ const createAuthor = async (req, res, next) => {
   try {
     const { body } = req
     const author = await authorsService.createAuthor(body)
-    res.status(201).send(author)
+
+    const emailErrors = await sendEmail(author.email, 'Welcome onboard!', `Welcome ${author.name}!`)
+
+    res.status(201).send({ email: emailErrors || 'Email sent successfully', author })
   } catch (e) {
     next(e)
   }
@@ -67,6 +81,7 @@ module.exports = {
   getAuthors,
   getAuthorById,
   editAuthorById,
+  uploadAuthorAvatar,
   deleteAuthorById,
   createAuthor,
   getAuthorBlogPosts,

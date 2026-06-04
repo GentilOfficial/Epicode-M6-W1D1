@@ -1,4 +1,5 @@
 const blogPostsService = require('./blogPosts.service')
+const sendEmail = require('../email/index')
 
 const getBlogPosts = async (req, res, next) => {
   try {
@@ -31,6 +32,16 @@ const editBlogPostById = async (req, res, next) => {
   }
 }
 
+const uploadBlogPostCover = async (req, res, next) => {
+  try {
+    const { file, params } = req
+    const blogPost = await blogPostsService.editBlogPostById(params.id, { cover: file.path })
+    res.status(200).send(blogPost)
+  } catch (e) {
+    next(e)
+  }
+}
+
 const deleteBlogPostById = async (req, res, next) => {
   try {
     const { params } = req
@@ -45,7 +56,14 @@ const createBlogPost = async (req, res, next) => {
   try {
     const { body } = req
     const blogPost = await blogPostsService.createBlogPost(body)
-    res.status(201).send(blogPost)
+
+    const emailErrors = await sendEmail(
+      blogPost.author,
+      'A new post has been created',
+      `Your new post, titled "${blogPost.title}", it's amazing!`,
+    )
+
+    res.status(201).send({ email: emailErrors || 'Email sent successfully', blogPost })
   } catch (e) {
     next(e)
   }
@@ -55,6 +73,7 @@ module.exports = {
   getBlogPosts,
   getBlogPostById,
   editBlogPostById,
+  uploadBlogPostCover,
   deleteBlogPostById,
   createBlogPost,
 }
