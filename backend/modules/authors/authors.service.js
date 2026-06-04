@@ -8,9 +8,8 @@ const getAuthors = async (currentPage, pageSize) => {
     .skip((currentPage - 1) * pageSize)
 
   const totalAuthors = await AuthorsSchema.countDocuments()
-  const totalPages = Math.ceil(totalAuthors / pageSize)
 
-  return paginateResponse(currentPage, pageSize, totalPages, totalAuthors, authors)
+  return paginateResponse(currentPage, pageSize, totalAuthors, authors)
 }
 
 const getAuthorById = async (id) => {
@@ -38,9 +37,8 @@ const getAuthorBlogPosts = async (id, currentPage, pageSize) => {
     .skip((currentPage - 1) * pageSize)
 
   const totalAuthorBlogPosts = await BlogPostsSchema.countDocuments({ author: email })
-  const totalPages = Math.ceil(totalAuthorBlogPosts / pageSize)
 
-  return paginateResponse(currentPage, pageSize, totalPages, totalAuthorBlogPosts, blogPosts)
+  return paginateResponse(currentPage, pageSize, totalAuthorBlogPosts, blogPosts)
 }
 
 module.exports = {

@@ -11,9 +11,8 @@ const getBlogPosts = async (title = '', currentPage, pageSize) => {
   const totalBlogPosts = await BlogPostsSchema.countDocuments({
     title: { $regex: title, $options: 'i' },
   })
-  const totalPages = Math.ceil(totalBlogPosts / pageSize)
 
-  return paginateResponse(currentPage, pageSize, totalPages, totalBlogPosts, blogPosts)
+  return paginateResponse(currentPage, pageSize, totalBlogPosts, blogPosts)
 }
 
 const getBlogPostById = async (id) => {
