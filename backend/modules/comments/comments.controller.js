@@ -38,7 +38,7 @@ const editCommentById = async (req, res, next) => {
 const deleteCommentById = async (req, res, next) => {
   try {
     const { params } = req
-    const comment = await commentsService.deleteCommentById(params.id, params.commentId)
+    const comment = await commentsService.deleteCommentById(params.blogPostId, params.commentId)
     res.status(200).send(comment)
   } catch (e) {
     next(e)
@@ -48,8 +48,8 @@ const deleteCommentById = async (req, res, next) => {
 const createComment = async (req, res, next) => {
   try {
     const { body, params } = req
-    const comment = await commentsService.createComment(params.id, body)
-    const { author, title } = await blogPostsSchema.findById(params.id, 'author title')
+    const comment = await commentsService.createComment(params.blogPostId, body)
+    const { author, title } = await blogPostsSchema.findById(params.blogPostId, 'author title')
 
     const { email } = await authorsSchema.findById(author, 'email')
 
