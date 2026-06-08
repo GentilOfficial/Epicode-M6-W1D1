@@ -17,7 +17,7 @@ const getAuthorById = async (id) => {
 }
 
 const editAuthorById = async (id, author) => {
-  return await AuthorsSchema.findByIdAndUpdate(id, author)
+  return await AuthorsSchema.findByIdAndUpdate(id, author, { new: true })
 }
 
 const deleteAuthorById = async (id) => {
