@@ -75,7 +75,7 @@ const NewBlogPost = () => {
       return 'Inserisci un tempo di lettura valido >= di 0'
     }
 
-    if (form.readTime.unit !== 'sec' || form.readTime.unit !== 'min') {
+    if (form.readTime.unit !== 'sec' && form.readTime.unit !== 'min') {
       return "Seleziona un'unità di tempo corretta"
     }
 
@@ -200,7 +200,7 @@ const NewBlogPost = () => {
               size="lg"
               type="number"
               placeholder="10"
-              min={1}
+              min={0}
               value={form.readTime.value}
               onChange={handleReadTimeChange}
             />
