@@ -9,7 +9,7 @@ const initialFormState = {
   author: '',
   readTime: {
     value: 0,
-    unit: '',
+    unit: 'sec',
   },
   content: '<h1>Titolo</h1><p>Inizia a scrivere il tuo post...</p>',
 }
@@ -71,12 +71,12 @@ const NewBlogPost = () => {
       return "L'autore è obbligatorio"
     }
 
-    if (!form.readTime.value || form.readTime.value <= 0) {
-      return 'Inserisci un tempo di lettura valido'
+    if (form.readTime.value < 0) {
+      return 'Inserisci un tempo di lettura valido >= di 0'
     }
 
-    if (!form.readTime.unit) {
-      return "Seleziona un'unità di tempo"
+    if (form.readTime.unit !== 'sec' || form.readTime.unit !== 'min') {
+      return "Seleziona un'unità di tempo corretta"
     }
 
     return null
@@ -203,14 +203,11 @@ const NewBlogPost = () => {
               min={1}
               value={form.readTime.value}
               onChange={handleReadTimeChange}
-              required
             />
 
-            <Form.Select name="unit" size="lg" value={form.readTime.unit} onChange={handleReadTimeChange} required>
-              <option value="">--- Seleziona ---</option>
+            <Form.Select name="unit" size="lg" value={form.readTime.unit} onChange={handleReadTimeChange}>
               <option value="sec">Secondi</option>
               <option value="min">Minuti</option>
-              <option value="ore">Ore</option>
             </Form.Select>
           </InputGroup>
         </Form.Group>

@@ -17,17 +17,11 @@ const validationSchema = [
     .isString()
     .withMessage('Title field must be a valid string'),
   body('cover').optional().isURL().withMessage('Cover must be a valid url'),
-  body('readTime').notEmpty().withMessage('Required read time field'),
   body('readTime.value')
-    .notEmpty()
-    .withMessage('Required read time value field')
-    .isInt({ min: 1 })
-    .withMessage('Read time value must be a valid integer greather than 0'),
-  body('readTime.unit')
-    .notEmpty()
-    .withMessage('Required read time unit field')
-    .isIn(['sec', 'min', 'ore'])
-    .withMessage('Read time unit must be sec, min or ore'),
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Read time value must be a valid integer greather or equal to 0'),
+  body('readTime.unit').optional().isIn(['sec', 'min']).withMessage("Read time unit must be 'sec' or 'min'"),
   body('author')
     .notEmpty()
     .withMessage('Required author field')
