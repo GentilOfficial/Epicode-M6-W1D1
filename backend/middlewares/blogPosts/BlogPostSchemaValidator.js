@@ -22,13 +22,7 @@ const validationSchema = [
     .isInt({ min: 0 })
     .withMessage('Read time value must be a valid integer greather or equal to 0'),
   body('readTime.unit').optional().isIn(['sec', 'min']).withMessage("Read time unit must be 'sec' or 'min'"),
-  body('author')
-    .notEmpty()
-    .withMessage('Required author field')
-    .isEmail()
-    .withMessage('Author field must be a valid email')
-    .isLength({ min: 3, max: 100 })
-    .withMessage('Author field must be at least 3 characters and no more than 50'),
+  body('author').notEmpty().withMessage('Required author ID field'),
   body('content')
     .notEmpty()
     .withMessage('Required content field')

@@ -21,7 +21,13 @@ const editAuthorById = async (id, author) => {
 }
 
 const deleteAuthorById = async (id) => {
-  return await AuthorsSchema.findByIdAndDelete(id)
+  const deletedUser = await AuthorsSchema.findByIdAndDelete(id)
+
+  if (!deletedUser) return null
+
+  await BlogPostsSchema.deleteMany({ _id: { $in: deletedUser.posts } })
+
+  return deletedUser
 }
 
 const createAuthor = async (author) => {

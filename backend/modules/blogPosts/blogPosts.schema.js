@@ -36,17 +36,16 @@ const BlogPostSchema = new Schema(
       },
     },
     author: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'Author',
       required: true,
-      minlength: 3,
-      maxlength: 100,
-      trim: true,
     },
     content: {
       type: mongoose.SchemaTypes.Html,
       sanitizeHtml: true,
       required: true,
     },
+    comments: [{ type: Schema.Types.ObjectId, ref: 'Comment', default: [] }],
   },
   {
     timestamps: true,

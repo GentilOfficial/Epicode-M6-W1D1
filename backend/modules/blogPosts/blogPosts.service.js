@@ -1,5 +1,6 @@
 const BlogPostsSchema = require('./blogPosts.schema')
 const paginateResponse = require('../../config/pagination')
+const authorsSchema = require('../authors/authors.schema')
 
 const getBlogPosts = async (title = '', currentPage, pageSize) => {
   const blogPosts = await BlogPostsSchema.find({
@@ -7,6 +8,7 @@ const getBlogPosts = async (title = '', currentPage, pageSize) => {
   })
     .limit(pageSize)
     .skip((currentPage - 1) * pageSize)
+    .populate(['author'])
 
   const totalBlogPosts = await BlogPostsSchema.countDocuments({
     title: { $regex: title, $options: 'i' },
@@ -24,12 +26,19 @@ const editBlogPostById = async (id, blogPost) => {
 }
 
 const deleteBlogPostById = async (id) => {
-  return await BlogPostsSchema.findByIdAndDelete(id)
+  const deletedBlogPost = await BlogPostsSchema.findByIdAndDelete(id)
+
+  if (!deletedBlogPost) return null
+
+  await authorsSchema.findByIdAndUpdate(deletedBlogPost.author, { $pull: { posts: deletedBlogPost._id } })
+
+  return deletedBlogPost
 }
 
 const createBlogPost = async (blogPost) => {
   const newBlogPost = new BlogPostsSchema(blogPost)
   const savedBlogPost = await newBlogPost.save()
+  await authorsSchema.findByIdAndUpdate(newBlogPost.author, { $push: { posts: savedBlogPost._id } })
   return savedBlogPost
 }
 
