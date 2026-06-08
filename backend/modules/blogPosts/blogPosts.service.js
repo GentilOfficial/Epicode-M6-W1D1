@@ -10,6 +10,14 @@ const getBlogPosts = async (title = '', currentPage, pageSize) => {
     .limit(pageSize)
     .skip((currentPage - 1) * pageSize)
     .populate('author', 'name surname email avatar')
+    .populate({
+      path: 'comments',
+      select: 'rate comment',
+      options: {
+        limit: 5,
+        sort: { createdAt: -1 },
+      },
+    })
 
   const totalBlogPosts = await BlogPostsSchema.countDocuments({
     title: { $regex: title, $options: 'i' },
@@ -20,6 +28,15 @@ const getBlogPosts = async (title = '', currentPage, pageSize) => {
 
 const getBlogPostById = async (id) => {
   return await BlogPostsSchema.findById(id)
+    .populate('author', 'name surname email avatar')
+    .populate({
+      path: 'comments',
+      select: 'rate comment',
+      options: {
+        limit: 10,
+        sort: { createdAt: -1 },
+      },
+    })
 }
 
 const editBlogPostById = async (id, blogPost) => {
