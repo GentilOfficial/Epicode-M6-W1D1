@@ -1,7 +1,7 @@
 const { body, validationResult } = require('express-validator')
 const HttpException = require('../../exceptions')
 
-const validationSchema = [
+const createAuthorValidationSchema = [
   body('name')
     .notEmpty()
     .withMessage('Required name field')
@@ -31,7 +31,7 @@ const validationSchema = [
   body('avatar').optional().isURL().withMessage('Avatar must be a valid url'),
 ]
 
-const AuthorSchemaValidator = async (req, res, next) => {
+const CreateAuthorSchemaValidator = async (req, res, next) => {
   try {
     const errors = validationResult(req)
 
@@ -55,6 +55,6 @@ const AuthorSchemaValidator = async (req, res, next) => {
 }
 
 module.exports = {
-  validationSchema,
-  AuthorSchemaValidator,
+  createAuthorValidationSchema,
+  CreateAuthorSchemaValidator,
 }

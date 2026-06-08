@@ -13,6 +13,7 @@ const CommentSchema = new Schema(
     comment: {
       type: String,
       required: true,
+      min: 3,
       max: 150,
     },
   },
@@ -22,4 +23,4 @@ const CommentSchema = new Schema(
   },
 )
 
-module.exports = mongoose.model('Comment', BlogPostSchema, 'comments')
+module.exports = mongoose.model('Comment', CommentSchema, 'comments')

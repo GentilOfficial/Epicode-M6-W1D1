@@ -46,7 +46,10 @@ const deleteAuthorById = async (req, res, next) => {
   try {
     const { params } = req
     const author = await authorsService.deleteAuthorById(params.id)
-    res.status(200).send(author)
+
+    const emailErrors = await sendEmail(author.email, 'Account deleted', `Your account has been deleted.`)
+
+    res.status(200).send({ email: emailErrors || 'Email sent successfully', author })
   } catch (e) {
     next(e)
   }
