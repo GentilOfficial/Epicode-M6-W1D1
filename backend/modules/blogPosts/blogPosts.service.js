@@ -12,7 +12,7 @@ const getBlogPosts = async (title = '', currentPage, pageSize) => {
     .populate('author', 'name surname email avatar')
     .populate({
       path: 'comments',
-      select: 'rate comment',
+      select: 'rate comment createdAt',
       options: {
         limit: 5,
         sort: { createdAt: -1 },
@@ -35,7 +35,7 @@ const getBlogPostById = async (id) => {
     .populate('author', 'name surname email avatar')
     .populate({
       path: 'comments',
-      select: 'rate comment',
+      select: 'rate comment createdAt',
       options: {
         limit: 10,
         sort: { createdAt: -1 },
