@@ -9,7 +9,7 @@ const {
   updateCommentValidationSchema,
   UpdateCommentSchemaValidator,
 } = require('../../middlewares/comments/UpdateCommentSchemaValidator')
-const checkBlogPostExists = require('../../middlewares/comments/checkBlogPostExists')
+const checkBlogPostExists = require('../../middlewares/blogPosts/checkBlogPostExists')
 
 comments.get('/:blogPostId/comments', [checkBlogPostExists], commentsController.getComments)
 comments.post(

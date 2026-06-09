@@ -14,6 +14,11 @@ const createCommentValidationSchema = [
     .withMessage('Comment field must be at least 3 characters and no more than 150')
     .isString()
     .withMessage('Comment field must be a valid string'),
+  body('author')
+    .notEmpty()
+    .withMessage('Required author ID field')
+    .isMongoId()
+    .withMessage('Author must be a valid MongoDB ID'),
 ]
 
 const CreateCommentSchemaValidator = async (req, res, next) => {

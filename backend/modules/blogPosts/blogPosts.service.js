@@ -17,6 +17,10 @@ const getBlogPosts = async (title = '', currentPage, pageSize) => {
         limit: 5,
         sort: { createdAt: -1 },
       },
+      populate: {
+        path: 'author',
+        select: 'name surname email avatar',
+      },
     })
 
   const totalBlogPosts = await BlogPostsSchema.countDocuments({
@@ -35,6 +39,10 @@ const getBlogPostById = async (id) => {
       options: {
         limit: 10,
         sort: { createdAt: -1 },
+      },
+      populate: {
+        path: 'author',
+        select: 'name surname email avatar',
       },
     })
 }

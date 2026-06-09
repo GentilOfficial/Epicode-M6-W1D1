@@ -13,8 +13,18 @@ const CommentSchema = new Schema(
     comment: {
       type: String,
       required: true,
-      min: 3,
-      max: 150,
+      minlength: 3,
+      maxlength: 150,
+    },
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: 'Author',
+      required: true,
+    },
+    blogPost: {
+      type: Schema.Types.ObjectId,
+      ref: 'BlogPost',
+      required: true,
     },
   },
   {

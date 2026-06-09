@@ -10,7 +10,7 @@ const {
   UpdateBlogPostSchemaValidator,
 } = require('../../middlewares/blogPosts/UpdateBlogPostSchemaValidator')
 const { blogPostsCoverStorage } = require('../../middlewares/multer')
-const commentsRoutes = require('../comments/comments.routes')
+const checkBlogPostExists = require('../../middlewares/blogPosts/checkBlogPostExists')
 
 blogPosts.get('/', blogPostsController.getBlogPosts)
 blogPosts.get('/:id', blogPostsController.getBlogPostById)
@@ -19,10 +19,12 @@ blogPosts.put(
   [updateBlogPostValidationSchema, UpdateBlogPostSchemaValidator],
   blogPostsController.editBlogPostById,
 )
-blogPosts.put('/:id/cover', blogPostsCoverStorage.single('cover'), blogPostsController.uploadBlogPostCover)
+blogPosts.put(
+  '/:id/cover',
+  [checkBlogPostExists, blogPostsCoverStorage.single('cover')],
+  blogPostsController.uploadBlogPostCover,
+)
 blogPosts.delete('/:id', blogPostsController.deleteBlogPostById)
 blogPosts.post('/', [createBlogPostValidationSchema, CreateBlogPostSchemaValidator], blogPostsController.createBlogPost)
-
-blogPosts.use('/', commentsRoutes)
 
 module.exports = blogPosts

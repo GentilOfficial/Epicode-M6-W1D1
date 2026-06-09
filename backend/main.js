@@ -6,6 +6,7 @@ require('dotenv').config()
 // routes
 const authorsRoutes = require('./modules/authors/authors.routes')
 const blogPostsRoutes = require('./modules/blogPosts/blogPosts.routes')
+const commentsRoutes = require('./modules/comments/comments.routes')
 
 // middlewares
 const logger = require('./middlewares/logger')
@@ -24,6 +25,7 @@ server.use(logger)
 
 server.use('/authors', authorsRoutes)
 server.use('/blogPosts', blogPostsRoutes)
+server.use('/blogPosts', commentsRoutes)
 
 server.use(errorHandler)
 

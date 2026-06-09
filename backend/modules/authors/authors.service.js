@@ -37,12 +37,11 @@ const createAuthor = async (author) => {
 }
 
 const getAuthorBlogPosts = async (id, currentPage, pageSize) => {
-  const { email } = await AuthorsSchema.findById(id)
-  const blogPosts = await BlogPostsSchema.find({ author: email })
+  const blogPosts = await BlogPostsSchema.find({ author: id })
     .limit(pageSize)
     .skip((currentPage - 1) * pageSize)
 
-  const totalAuthorBlogPosts = await BlogPostsSchema.countDocuments({ author: email })
+  const totalAuthorBlogPosts = await BlogPostsSchema.countDocuments({ author: id })
 
   return paginateResponse(currentPage, pageSize, totalAuthorBlogPosts, blogPosts)
 }
