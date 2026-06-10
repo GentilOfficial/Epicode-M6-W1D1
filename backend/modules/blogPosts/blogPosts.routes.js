@@ -13,6 +13,7 @@ const { blogPostsCoverStorage } = require('../../middlewares/multer')
 const checkBlogPostExists = require('../../middlewares/blogPosts/checkBlogPostExists')
 
 blogPosts.get('/', blogPostsController.getBlogPosts)
+blogPosts.post('/', [createBlogPostValidationSchema, CreateBlogPostSchemaValidator], blogPostsController.createBlogPost)
 blogPosts.get('/:id', blogPostsController.getBlogPostById)
 blogPosts.put(
   '/:id',
@@ -25,6 +26,5 @@ blogPosts.put(
   blogPostsController.uploadBlogPostCover,
 )
 blogPosts.delete('/:id', blogPostsController.deleteBlogPostById)
-blogPosts.post('/', [createBlogPostValidationSchema, CreateBlogPostSchemaValidator], blogPostsController.createBlogPost)
 
 module.exports = blogPosts

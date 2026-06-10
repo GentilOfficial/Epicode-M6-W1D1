@@ -13,7 +13,7 @@ const checkBlogPostExists = require('../../middlewares/blogPosts/checkBlogPostEx
 
 comments.get('/:blogPostId/comments', [checkBlogPostExists], commentsController.getComments)
 comments.post(
-  '/:blogPostId/comments',
+  '/:blogPostId',
   [checkBlogPostExists, createCommentValidationSchema, CreateCommentSchemaValidator],
   commentsController.createComment,
 )

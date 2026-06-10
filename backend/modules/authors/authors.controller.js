@@ -63,7 +63,11 @@ const deleteAuthorById = async (req, res, next) => {
       throw new HttpException('Not found', 404, 'The requested author was not found')
     }
 
-    const emailErrors = await sendEmail(author.email, 'Account deleted', `Your account has been deleted.`)
+    const emailErrors = await sendEmail(
+      author.email,
+      'Account deleted',
+      `Your account, comments, blogPosts and related commentes have been deleted.`,
+    )
 
     res.status(200).send({ email: emailErrors || 'Email sent successfully', author })
   } catch (e) {

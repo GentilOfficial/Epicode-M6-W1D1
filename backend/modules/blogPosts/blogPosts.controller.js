@@ -1,5 +1,5 @@
 const blogPostsService = require('./blogPosts.service')
-const authorsService = require('../authors/authors.service')
+const AuthorsService = require('../authors/authors.service')
 const sendEmail = require('../email/index')
 const HttpException = require('../../exceptions')
 
@@ -64,12 +64,14 @@ const deleteBlogPostById = async (req, res, next) => {
       throw new HttpException('Not found', 404, 'The requested blogPost was not found')
     }
 
-    const { email } = await authorsService.getAuthorById(blogPost.author)
+    console.log(blogPost)
+
+    const { email } = await AuthorsService.getAuthorById(blogPost.author)
 
     const emailErrors = await sendEmail(
       email,
       'Post deleted',
-      `Your post, titled "${blogPost.title}", has been deleted.`,
+      `Your post, titled "${blogPost.title}", and related comments have been deleted.`,
     )
 
     res.status(200).send({ email: emailErrors || 'Email sent successfully', blogPost })
@@ -82,7 +84,7 @@ const createBlogPost = async (req, res, next) => {
   try {
     const { body } = req
     const blogPost = await blogPostsService.createBlogPost(body)
-    const { email } = await authorsService.getAuthorById(blogPost.author)
+    const { email } = await AuthorsService.getAuthorById(blogPost.author)
 
     const emailErrors = await sendEmail(
       email,

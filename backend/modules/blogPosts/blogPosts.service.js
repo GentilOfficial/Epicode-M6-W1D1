@@ -1,71 +1,44 @@
 const BlogPostsSchema = require('./blogPosts.schema')
+const CommentsSchema = require('../comments/comments.schema')
 const paginateResponse = require('../../config/pagination')
-const authorsSchema = require('../authors/authors.schema')
-const commentsSchema = require('../comments/comments.schema')
 
 const getBlogPosts = async (title = '', currentPage, pageSize) => {
-  const blogPosts = await BlogPostsSchema.find({
-    title: { $regex: title, $options: 'i' },
-  })
-    .limit(pageSize)
-    .skip((currentPage - 1) * pageSize)
-    .populate('author', 'name surname email avatar')
-    .populate({
-      path: 'comments',
-      select: 'rate comment createdAt',
-      options: {
-        limit: 5,
-        sort: { createdAt: -1 },
-      },
-      populate: {
-        path: 'author',
-        select: 'name surname email avatar',
-      },
+  const [blogPosts, totalBlogPosts] = await Promise.all([
+    BlogPostsSchema.find({
+      title: { $regex: title, $options: 'i' },
     })
-
-  const totalBlogPosts = await BlogPostsSchema.countDocuments({
-    title: { $regex: title, $options: 'i' },
-  })
+      .limit(pageSize)
+      .skip((currentPage - 1) * pageSize)
+      .populate('author', 'name surname email avatar'),
+    BlogPostsSchema.countDocuments({
+      title: { $regex: title, $options: 'i' },
+    }),
+  ])
 
   return paginateResponse(currentPage, pageSize, totalBlogPosts, blogPosts)
 }
 
 const getBlogPostById = async (id) => {
-  return await BlogPostsSchema.findById(id)
-    .populate('author', 'name surname email avatar')
-    .populate({
-      path: 'comments',
-      select: 'rate comment createdAt',
-      options: {
-        limit: 10,
-        sort: { createdAt: -1 },
-      },
-      populate: {
-        path: 'author',
-        select: 'name surname email avatar',
-      },
-    })
+  return await BlogPostsSchema.findById(id).populate('author', 'name surname email avatar')
 }
 
 const editBlogPostById = async (id, blogPost) => {
-  return await BlogPostsSchema.findByIdAndUpdate(id, blogPost, { new: true })
+  return await BlogPostsSchema.findByIdAndUpdate(id, { blogPost }, { new: true })
 }
 
 const deleteBlogPostById = async (id) => {
-  const deletedBlogPost = await BlogPostsSchema.findByIdAndDelete(id)
+  const deletedBlogPost = await BlogPostsSchema.findByIdAndDelete(id).lean()
 
   if (!deletedBlogPost) return null
 
-  await authorsSchema.findByIdAndUpdate(deletedBlogPost.author, { $pull: { posts: deletedBlogPost._id } })
-  await commentsSchema.deleteMany({ _id: { $in: deletedBlogPost.comments } })
+  const deletedComments = await CommentsSchema.deleteMany({ blogPost: deletedBlogPost._id })
 
-  return deletedBlogPost
+  return { ...deletedBlogPost, deletedComments }
 }
 
 const createBlogPost = async (blogPost) => {
   const newBlogPost = new BlogPostsSchema(blogPost)
   const savedBlogPost = await newBlogPost.save()
-  await authorsSchema.findByIdAndUpdate(newBlogPost.author, { $push: { posts: savedBlogPost._id } })
   return savedBlogPost
 }
 

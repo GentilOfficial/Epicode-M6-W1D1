@@ -2,6 +2,8 @@ const mongoose = require('mongoose')
 const HttpException = require('../exceptions/index')
 
 const errorHandler = (error, req, res, next) => {
+  console.log(error)
+
   if (error instanceof HttpException) {
     return res.status(error.statusCode).send({
       code: error.statusCode,

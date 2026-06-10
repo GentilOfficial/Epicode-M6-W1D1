@@ -35,7 +35,6 @@ const AuthorSchema = new Schema(
       trim: true,
       default: 'https://i.pravatar.cc/150',
     },
-    posts: [{ type: Schema.Types.ObjectId, ref: 'BlogPost', default: [] }],
   },
   {
     timestamps: true,

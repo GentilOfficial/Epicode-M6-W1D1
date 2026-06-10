@@ -1,13 +1,15 @@
-const BlogPostsSchema = require('../blogPosts/blogPosts.schema')
 const AuthorsSchema = require('./authors.schema')
+const BlogPostsSchema = require('../blogPosts/blogPosts.schema')
+const CommentsSchema = require('../comments/comments.schema')
 const paginateResponse = require('../../config/pagination')
 
 const getAuthors = async (currentPage, pageSize) => {
-  const authors = await AuthorsSchema.find()
-    .limit(pageSize)
-    .skip((currentPage - 1) * pageSize)
-
-  const totalAuthors = await AuthorsSchema.countDocuments()
+  const [authors, totalAuthors] = await Promise.all([
+    AuthorsSchema.find()
+      .limit(pageSize)
+      .skip((currentPage - 1) * pageSize),
+    AuthorsSchema.countDocuments(),
+  ])
 
   return paginateResponse(currentPage, pageSize, totalAuthors, authors)
 }
@@ -21,13 +23,22 @@ const editAuthorById = async (id, author) => {
 }
 
 const deleteAuthorById = async (id) => {
-  const deletedUser = await AuthorsSchema.findByIdAndDelete(id)
+  const deletedAuthor = await AuthorsSchema.findByIdAndDelete(id).lean()
 
-  if (!deletedUser) return null
+  if (!deletedAuthor) return null
 
-  await BlogPostsSchema.deleteMany({ _id: { $in: deletedUser.posts } })
+  const blogPostIds = await BlogPostsSchema.distinct('_id', { author: deletedAuthor._id })
 
-  return deletedUser
+  const [deletedBlogPosts, deletedComments] = await Promise.all([
+    BlogPostsSchema.deleteMany({
+      author: deletedAuthor._id,
+    }),
+    CommentsSchema.deleteMany({
+      $or: [{ blogPost: { $in: blogPostIds } }, { author: deletedAuthor._id }],
+    }),
+  ])
+
+  return { ...deletedAuthor, deletedBlogPosts, deletedComments }
 }
 
 const createAuthor = async (author) => {
@@ -37,11 +48,12 @@ const createAuthor = async (author) => {
 }
 
 const getAuthorBlogPosts = async (id, currentPage, pageSize) => {
-  const blogPosts = await BlogPostsSchema.find({ author: id })
-    .limit(pageSize)
-    .skip((currentPage - 1) * pageSize)
-
-  const totalAuthorBlogPosts = await BlogPostsSchema.countDocuments({ author: id })
+  const [blogPosts, totalAuthorBlogPosts] = await Promise.all([
+    BlogPostsSchema.find({ author: id })
+      .limit(pageSize)
+      .skip((currentPage - 1) * pageSize),
+    BlogPostsSchema.countDocuments({ author: id }),
+  ])
 
   return paginateResponse(currentPage, pageSize, totalAuthorBlogPosts, blogPosts)
 }
