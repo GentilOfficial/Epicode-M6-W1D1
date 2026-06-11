@@ -1,6 +1,7 @@
 const authorsService = require('./authors.service')
 const sendEmail = require('../email/index')
 const HttpException = require('../../exceptions')
+const { uploadToCloudinary } = require('../../middlewares/multer')
 
 const getAuthors = async (req, res, next) => {
   try {
@@ -46,7 +47,18 @@ const editAuthorById = async (req, res, next) => {
 const uploadAuthorAvatar = async (req, res, next) => {
   try {
     const { file, params } = req
-    const author = await authorsService.editAuthorById(params.id, { avatar: file.path })
+
+    if (!file) {
+      throw new HttpException('Missing file', 400, 'No files have been uploaded')
+    }
+
+    const { secure_url } = await uploadToCloudinary(file.buffer, {
+      folder: 'Epicode-M6-avatars',
+      format: 'webp',
+      transformation: { width: 300, height: 300, crop: 'fill' },
+    })
+
+    const author = await authorsService.editAuthorById(params.id, { avatar: secure_url })
 
     res.status(200).send(author)
   } catch (e) {

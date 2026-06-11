@@ -20,7 +20,6 @@ const updateBlogPostValidationSchema = [
     .isInt({ min: 0 })
     .withMessage('Read time value must be a valid integer greather or equal to 0'),
   body('readTime.unit').optional().isIn(['sec', 'min']).withMessage("Read time unit must be 'sec' or 'min'"),
-  body('author').optional().isMongoId().withMessage('Author must be a valid MongoDB ID'),
   body('content').optional().isString().withMessage('Content field must be a valid string'),
 ]
 

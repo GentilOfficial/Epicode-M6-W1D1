@@ -7,9 +7,11 @@ require('dotenv').config()
 const authorsRoutes = require('./modules/authors/authors.routes')
 const blogPostsRoutes = require('./modules/blogPosts/blogPosts.routes')
 const commentsRoutes = require('./modules/comments/comments.routes')
+const authRoutes = require('./modules/auth/auth.routes')
 
 // middlewares
 const logger = require('./middlewares/logger')
+const validateAuthToken = require('./middlewares/auth/validateAuthToken')
 const errorHandler = require('./middlewares/errorHandler')
 
 // server configs
@@ -22,7 +24,9 @@ server.use(express.json())
 server.use(cors())
 
 server.use(logger)
+server.use(validateAuthToken)
 
+server.use('/', authRoutes)
 server.use('/authors', authorsRoutes)
 server.use('/blogPosts', blogPostsRoutes)
 server.use('/blogPosts', commentsRoutes)

@@ -1,6 +1,5 @@
 const multer = require('multer')
 const cloudinary = require('cloudinary').v2
-const { CloudinaryStorage } = require('multer-storage-cloudinary')
 require('dotenv').config()
 
 cloudinary.config({
@@ -9,43 +8,18 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-const avatarsStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'Epicode-M6-avatars',
-    format: async (req, file) => 'webp',
-    public_id: (req, file) => file.name,
-    transformation: [
-      {
-        width: 300,
-        height: 300,
-        crop: 'fill',
-      },
-    ],
-  },
-})
-const coversStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'Epicode-M6-covers',
-    format: async (req, file) => 'webp',
-    public_id: (req, file) => file.name,
-    transformation: [
-      {
-        width: 450,
-        height: 300,
-        crop: 'fill',
-      },
-    ],
-  },
-})
+const storage = multer.memoryStorage()
+const uploadToBuffer = multer({ storage })
 
-const authorsAvatarStorage = multer({
-  storage: avatarsStorage,
-})
+const uploadToCloudinary = (buffer, options) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(options, (err, res) => {
+      if (err) return reject(err)
+      resolve(res)
+    })
 
-const blogPostsCoverStorage = multer({
-  storage: coversStorage,
-})
+    stream.end(buffer)
+  })
+}
 
-module.exports = { authorsAvatarStorage, blogPostsCoverStorage }
+module.exports = { uploadToBuffer, uploadToCloudinary }

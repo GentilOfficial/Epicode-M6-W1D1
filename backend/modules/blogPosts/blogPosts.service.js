@@ -23,7 +23,7 @@ const getBlogPostById = async (id) => {
 }
 
 const editBlogPostById = async (id, blogPost) => {
-  return await BlogPostsSchema.findByIdAndUpdate(id, { blogPost }, { new: true })
+  return await BlogPostsSchema.findByIdAndUpdate(id, blogPost, { returnDocument: 'after' })
 }
 
 const deleteBlogPostById = async (id) => {

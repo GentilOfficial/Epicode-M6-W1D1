@@ -22,11 +22,6 @@ const createBlogPostValidationSchema = [
     .isInt({ min: 0 })
     .withMessage('Read time value must be a valid integer greather or equal to 0'),
   body('readTime.unit').optional().isIn(['sec', 'min']).withMessage("Read time unit must be 'sec' or 'min'"),
-  body('author')
-    .notEmpty()
-    .withMessage('Required author ID field')
-    .isMongoId()
-    .withMessage('Author must be a valid MongoDB ID'),
   body('content')
     .notEmpty()
     .withMessage('Required content field')

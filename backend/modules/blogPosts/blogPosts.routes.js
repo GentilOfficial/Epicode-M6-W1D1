@@ -9,7 +9,7 @@ const {
   updateBlogPostValidationSchema,
   UpdateBlogPostSchemaValidator,
 } = require('../../middlewares/blogPosts/UpdateBlogPostSchemaValidator')
-const { blogPostsCoverStorage } = require('../../middlewares/multer')
+const { uploadToBuffer } = require('../../middlewares/multer')
 const checkBlogPostExists = require('../../middlewares/blogPosts/checkBlogPostExists')
 
 blogPosts.get('/', blogPostsController.getBlogPosts)
@@ -22,7 +22,7 @@ blogPosts.put(
 )
 blogPosts.put(
   '/:id/cover',
-  [checkBlogPostExists, blogPostsCoverStorage.single('cover')],
+  [checkBlogPostExists, uploadToBuffer.single('cover')],
   blogPostsController.uploadBlogPostCover,
 )
 blogPosts.delete('/:id', blogPostsController.deleteBlogPostById)

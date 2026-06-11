@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-require('mongoose-type-html')
 
 const { Schema } = mongoose
 
@@ -41,8 +40,7 @@ const BlogPostSchema = new Schema(
       required: true,
     },
     content: {
-      type: mongoose.SchemaTypes.Html,
-      sanitizeHtml: true,
+      type: String,
       required: true,
     },
   },

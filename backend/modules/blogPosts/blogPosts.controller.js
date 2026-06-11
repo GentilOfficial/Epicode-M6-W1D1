@@ -2,6 +2,7 @@ const blogPostsService = require('./blogPosts.service')
 const AuthorsService = require('../authors/authors.service')
 const sendEmail = require('../email/index')
 const HttpException = require('../../exceptions')
+const { uploadToCloudinary } = require('../../middlewares/multer')
 
 const getBlogPosts = async (req, res, next) => {
   try {
@@ -31,8 +32,8 @@ const getBlogPostById = async (req, res, next) => {
 
 const editBlogPostById = async (req, res, next) => {
   try {
-    const { body, params } = req
-    const blogPost = await blogPostsService.editBlogPostById(params.id, body)
+    const { body, params, author } = req
+    const blogPost = await blogPostsService.editBlogPostById(params.id, { ...body, author: author.id })
 
     if (!blogPost) {
       throw new HttpException('Not found', 404, 'The requested blogPost was not found')
@@ -47,7 +48,18 @@ const editBlogPostById = async (req, res, next) => {
 const uploadBlogPostCover = async (req, res, next) => {
   try {
     const { file, params } = req
-    const blogPost = await blogPostsService.editBlogPostById(params.id, { cover: file.path })
+
+    if (!file) {
+      throw new HttpException('Missing file', 400, 'No files have been uploaded')
+    }
+
+    const { secure_url } = await uploadToCloudinary(file.buffer, {
+      folder: 'Epicode-M6-covers',
+      format: 'webp',
+      transformation: { width: 450, height: 300, crop: 'fill' },
+    })
+
+    const blogPost = await blogPostsService.editBlogPostById(params.id, { cover: secure_url })
 
     res.status(200).send(blogPost)
   } catch (e) {
@@ -63,8 +75,6 @@ const deleteBlogPostById = async (req, res, next) => {
     if (!blogPost) {
       throw new HttpException('Not found', 404, 'The requested blogPost was not found')
     }
-
-    console.log(blogPost)
 
     const { email } = await AuthorsService.getAuthorById(blogPost.author)
 
@@ -82,12 +92,11 @@ const deleteBlogPostById = async (req, res, next) => {
 
 const createBlogPost = async (req, res, next) => {
   try {
-    const { body } = req
-    const blogPost = await blogPostsService.createBlogPost(body)
-    const { email } = await AuthorsService.getAuthorById(blogPost.author)
+    const { body, author } = req
+    const blogPost = await blogPostsService.createBlogPost({ ...body, author: author.id })
 
     const emailErrors = await sendEmail(
-      email,
+      author.email,
       'A new post has been created',
       `Your new post, titled "${blogPost.title}", it's amazing!`,
     )

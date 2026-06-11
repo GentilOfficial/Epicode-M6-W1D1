@@ -34,8 +34,11 @@ const getCommentById = async (req, res, next) => {
 
 const editCommentById = async (req, res, next) => {
   try {
-    const { body, params } = req
-    const comment = await commentsService.editCommentById(params.blogPostId, params.commentId, body)
+    const { body, params, author } = req
+    const comment = await commentsService.editCommentById(params.blogPostId, params.commentId, {
+      ...body,
+      author: author.id,
+    })
 
     if (!comment) {
       throw new HttpException('Not found', 404, 'The requested comment was not found in this blogPost')
@@ -64,14 +67,12 @@ const deleteCommentById = async (req, res, next) => {
 
 const createComment = async (req, res, next) => {
   try {
-    const { body, params } = req
-    const comment = await commentsService.createComment(params.blogPostId, body)
-    const { author, title } = await blogPostsSchema.findById(params.blogPostId, 'author title')
-
-    const { email } = await authorsSchema.findById(author, 'email')
+    const { body, params, author } = req
+    const comment = await commentsService.createComment(params.blogPostId, { ...body, author: author.id })
+    const { title } = await blogPostsSchema.findById(params.blogPostId, 'title')
 
     const emailErrors = await sendEmail(
-      email,
+      author.email,
       'New comment',
       `A new comment has been posted on your post titled "${title}".
        Rate: ${comment.rate}

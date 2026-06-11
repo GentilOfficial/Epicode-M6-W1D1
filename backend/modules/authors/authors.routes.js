@@ -9,18 +9,14 @@ const {
   updateAuthorValidationSchema,
   UpdateAuthorSchemaValidator,
 } = require('../../middlewares/authors/UpdateAuthorSchemaValidator')
-const { authorsAvatarStorage } = require('../../middlewares/multer')
+const { uploadToBuffer } = require('../../middlewares/multer')
 const checkAuthorExists = require('../../middlewares/authors/checkAuthorExists')
 
 authors.get('/', authorsController.getAuthors)
 authors.post('/', [createAuthorValidationSchema, CreateAuthorSchemaValidator], authorsController.createAuthor)
 authors.get('/:id', authorsController.getAuthorById)
 authors.put('/:id', [updateAuthorValidationSchema, UpdateAuthorSchemaValidator], authorsController.editAuthorById)
-authors.put(
-  '/:id/avatar',
-  [checkAuthorExists, authorsAvatarStorage.single('avatar')],
-  authorsController.uploadAuthorAvatar,
-)
+authors.put('/:id/avatar', [checkAuthorExists, uploadToBuffer.single('avatar')], authorsController.uploadAuthorAvatar)
 authors.delete('/:id', authorsController.deleteAuthorById)
 authors.get('/:id/blogPosts', [checkAuthorExists], authorsController.getAuthorBlogPosts)
 

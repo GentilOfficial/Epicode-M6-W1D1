@@ -19,7 +19,11 @@ const getCommentById = async (blogPostId, id) => {
 
 const editCommentById = async (blogPostId, id, updatedComment) => {
   const { rate, comment } = updatedComment
-  return await CommentsSchema.findOneAndUpdate({ _id: id, blogPost: blogPostId }, { rate, comment }, { new: true })
+  return await CommentsSchema.findOneAndUpdate(
+    { _id: id, blogPost: blogPostId },
+    { rate, comment },
+    { returnDocument: 'after' },
+  )
 }
 
 const deleteCommentById = async (blogPostId, id) => {
