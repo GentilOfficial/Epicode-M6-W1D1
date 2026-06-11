@@ -23,6 +23,19 @@ const createAuthorValidationSchema = [
     .withMessage('Email field must be a valid email')
     .isLength({ max: 100 })
     .withMessage('Email field must be 50 characters or fewer'),
+  body('password')
+    .notEmpty()
+    .withMessage('Password is required')
+    .isStrongPassword({
+      minLength: 12,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+      minSymbols: 1,
+    })
+    .withMessage(
+      'Password must be at least 12 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one symbol',
+    ),
   body('birthday')
     .notEmpty()
     .withMessage('Required birthday field')

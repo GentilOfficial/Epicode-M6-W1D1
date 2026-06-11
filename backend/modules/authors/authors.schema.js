@@ -26,6 +26,11 @@ const AuthorSchema = new Schema(
       lowercase: true,
       maxlength: 100,
     },
+    password: {
+      type: String,
+      required: true,
+      minlength: 12,
+    },
     birthday: {
       type: Date,
       required: true,

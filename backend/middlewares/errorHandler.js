@@ -33,6 +33,16 @@ const errorHandler = (error, req, res, next) => {
     })
   }
 
+  if (error.code === 11000) {
+    const fields = Object.keys(error.keyValue)
+
+    return res.status(409).json({
+      code: 409,
+      message: 'Duplicated key',
+      error: fields,
+    })
+  }
+
   return res.status(500).send({
     code: 500,
     message: 'Internal server error',
