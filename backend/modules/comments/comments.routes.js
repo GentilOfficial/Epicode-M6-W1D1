@@ -10,6 +10,7 @@ const {
   UpdateCommentSchemaValidator,
 } = require('../../middlewares/comments/UpdateCommentSchemaValidator')
 const checkBlogPostExists = require('../../middlewares/blogPosts/checkBlogPostExists')
+const checkCommentOwner = require('../../middlewares/comments/checkCommentOwner')
 
 comments.get('/:blogPostId/comments', [checkBlogPostExists], commentsController.getComments)
 comments.post(
@@ -20,9 +21,13 @@ comments.post(
 comments.get('/:blogPostId/comments/:commentId', [checkBlogPostExists], commentsController.getCommentById)
 comments.put(
   '/:blogPostId/comments/:commentId',
-  [checkBlogPostExists, updateCommentValidationSchema, UpdateCommentSchemaValidator],
+  [checkBlogPostExists, checkCommentOwner, updateCommentValidationSchema, UpdateCommentSchemaValidator],
   commentsController.editCommentById,
 )
-comments.delete('/:blogPostId/comments/:commentId', [checkBlogPostExists], commentsController.deleteCommentById)
+comments.delete(
+  '/:blogPostId/comments/:commentId',
+  [checkBlogPostExists, checkCommentOwner],
+  commentsController.deleteCommentById,
+)
 
 module.exports = comments

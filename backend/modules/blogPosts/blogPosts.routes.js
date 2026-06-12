@@ -11,20 +11,21 @@ const {
 } = require('../../middlewares/blogPosts/UpdateBlogPostSchemaValidator')
 const { uploadToBuffer } = require('../../middlewares/multer')
 const checkBlogPostExists = require('../../middlewares/blogPosts/checkBlogPostExists')
+const checkBlogPostOwner = require('../../middlewares/blogPosts/checkBlogPostOwner')
 
 blogPosts.get('/', blogPostsController.getBlogPosts)
 blogPosts.post('/', [createBlogPostValidationSchema, CreateBlogPostSchemaValidator], blogPostsController.createBlogPost)
 blogPosts.get('/:id', blogPostsController.getBlogPostById)
 blogPosts.put(
   '/:id',
-  [updateBlogPostValidationSchema, UpdateBlogPostSchemaValidator],
+  [checkBlogPostExists, checkBlogPostOwner, updateBlogPostValidationSchema, UpdateBlogPostSchemaValidator],
   blogPostsController.editBlogPostById,
 )
 blogPosts.put(
   '/:id/cover',
-  [checkBlogPostExists, uploadToBuffer.single('cover')],
+  [checkBlogPostOwner, checkBlogPostExists, uploadToBuffer.single('cover')],
   blogPostsController.uploadBlogPostCover,
 )
-blogPosts.delete('/:id', blogPostsController.deleteBlogPostById)
+blogPosts.delete('/:id', [checkBlogPostExists, checkBlogPostOwner], blogPostsController.deleteBlogPostById)
 
 module.exports = blogPosts

@@ -21,7 +21,7 @@ const login = async (email, password) => {
       avatar: user.avatar,
     },
     process.env.JWT_SIGN_SECRET,
-    { expiresIn: '1m' },
+    { expiresIn: process.env.JWT_DURATION },
   )
 
   return token

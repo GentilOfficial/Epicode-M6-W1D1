@@ -10,6 +10,8 @@ const checkBlogPostExists = async (req, res, next) => {
       throw new HttpException('Not found', 404, 'The requested blogPost was not found')
     }
 
+    req.blogPost = blogPost
+
     next()
   } catch (e) {
     next(e)
