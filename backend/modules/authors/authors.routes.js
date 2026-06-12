@@ -23,7 +23,7 @@ authors.put(
 )
 authors.put(
   '/:id/avatar',
-  [checkAuthorOwner, checkAuthorExists, uploadToBuffer.single('avatar')],
+  [checkAuthorExists, checkAuthorOwner, uploadToBuffer.single('avatar')],
   authorsController.uploadAuthorAvatar,
 )
 authors.delete('/:id', checkAuthorOwner, authorsController.deleteAuthorById)

@@ -3,16 +3,8 @@ const jwt = require('jsonwebtoken')
 const AuthorsSchema = require('../authors/authors.schema')
 require('dotenv').config()
 
-const login = async (email, password) => {
-  const user = await AuthorsSchema.findOne({ email })
-
-  if (!user) return null
-
-  const passwordVerified = await bcrypt.compare(password, user.password)
-
-  if (!passwordVerified) return null
-
-  const token = jwt.sign(
+const generateJWT = (user) => {
+  return jwt.sign(
     {
       id: user.id,
       name: user.name,
@@ -23,8 +15,18 @@ const login = async (email, password) => {
     process.env.JWT_SIGN_SECRET,
     { expiresIn: process.env.JWT_DURATION },
   )
-
-  return token
 }
 
-module.exports = { login }
+const login = async (email, password) => {
+  const author = await AuthorsSchema.findOne({ email })
+
+  if (!author) return null
+
+  const passwordVerified = await bcrypt.compare(password, author.password)
+
+  if (!passwordVerified) return null
+
+  return generateJWT(author)
+}
+
+module.exports = { generateJWT, login }

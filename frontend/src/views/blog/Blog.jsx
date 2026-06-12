@@ -1,35 +1,52 @@
-import { useEffect, useState } from 'react'
-import { Badge, Container, Image } from 'react-bootstrap'
+import { useContext, useEffect, useState } from 'react'
+import { Alert, Badge, Container, Image, Spinner } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router'
 import BlogAuthor from '../../components/blog/blog-author/BlogAuthor'
 import BlogLike from '../../components/likes/BlogLike'
+import { AuthContext } from '../../providers/AuthenticationProvider'
 import './styles.css'
 
 const Blog = () => {
+  const { token } = useContext(AuthContext)
   const [blog, setBlog] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   const params = useParams()
   const navigate = useNavigate()
 
   useEffect(() => {
     const fetchBlog = async () => {
+      setLoading(true)
+      setError(null)
+
       try {
         const { id } = params
 
-        const res = await fetch(`http://localhost:4545/blogPosts/${id}`)
+        const res = await fetch(`${import.meta.env.VITE_API_SERVER}/blogPosts/${id}`, {
+          headers: {
+            Authorization: token,
+          },
+        })
 
-        if (!res.ok) {
+        if (res.status === 404) {
           navigate('/404')
           return
         }
 
+        if (!res.ok) {
+          throw new Error(`HTTP error ${res.status}`)
+        }
+
         const data = await res.json()
-        console.log(data)
+
+        if (!data) {
+          throw new Error('Dati non validi')
+        }
+
         setBlog(data)
       } catch (err) {
-        console.error(err)
-        navigate('/404')
+        setError(err.message || 'Errore nel caricamento del blog')
       } finally {
         setLoading(false)
       }
@@ -39,7 +56,23 @@ const Blog = () => {
   }, [params.id, navigate])
 
   if (loading) {
-    return <div>loading</div>
+    return (
+      <div className="text-center my-5">
+        <Spinner animation="border" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <Container className="mt-4">
+        <Alert variant="danger">{error}</Alert>
+      </Container>
+    )
+  }
+
+  if (!blog) {
+    return null
   }
 
   return (
@@ -60,7 +93,7 @@ const Blog = () => {
             <div>{blog.createdAt}</div>
 
             <div>
-              lettura da {blog.readTime.value} {blog.readTime.unit}
+              lettura da {blog.readTime?.value} {blog.readTime?.unit}
             </div>
 
             <div style={{ marginTop: 20 }}>

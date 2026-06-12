@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Alert, Button, Container, Form, InputGroup, Spinner } from 'react-bootstrap'
 import Editor from '../../components/editor/Editor'
+import { AuthContext } from '../../providers/AuthenticationProvider'
 import './styles.css'
 
 const initialFormState = {
   title: '',
   category: '',
-  author: '',
   readTime: {
     value: 0,
     unit: 'sec',
@@ -15,6 +15,7 @@ const initialFormState = {
 }
 
 const NewBlogPost = () => {
+  const { token } = useContext(AuthContext)
   const [form, setForm] = useState(initialFormState)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -67,12 +68,8 @@ const NewBlogPost = () => {
       return 'Seleziona una categoria'
     }
 
-    if (!form.author.trim()) {
-      return "L'autore è obbligatorio"
-    }
-
     if (form.readTime.value < 0) {
-      return 'Inserisci un tempo di lettura valido >= di 0'
+      return 'Inserisci un tempo di lettura valido >= 0'
     }
 
     if (form.readTime.unit !== 'sec' && form.readTime.unit !== 'min') {
@@ -86,7 +83,6 @@ const NewBlogPost = () => {
     resetMessages()
 
     const validationError = validateForm()
-
     if (validationError) {
       setError(validationError)
       return
@@ -95,10 +91,11 @@ const NewBlogPost = () => {
     setLoading(true)
 
     try {
-      const response = await fetch('http://localhost:4545/blogPosts', {
+      const response = await fetch(`${import.meta.env.VITE_API_SERVER}/blogPosts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: token,
         },
         body: JSON.stringify(form),
       })
@@ -113,8 +110,11 @@ const NewBlogPost = () => {
         const formData = new FormData()
         formData.append('cover', coverFile)
 
-        const uploadResponse = await fetch(`http://localhost:4545/blogPosts/${blogPost._id}/cover`, {
+        const uploadResponse = await fetch(`${import.meta.env.VITE_API_SERVER}/blogPosts/${blogPost._id}/cover`, {
           method: 'PUT',
+          headers: {
+            Authorization: token,
+          },
           body: formData,
         })
 
@@ -142,12 +142,10 @@ const NewBlogPost = () => {
     <Container className="new-blog-container">
       <Form className="mt-5" onSubmit={handleSubmit}>
         {error && <Alert variant="danger">{error}</Alert>}
-
         {success && <Alert variant="success">{success}</Alert>}
 
         <Form.Group className="mt-3">
           <Form.Label>Titolo</Form.Label>
-
           <Form.Control
             name="title"
             size="lg"
@@ -160,7 +158,6 @@ const NewBlogPost = () => {
 
         <Form.Group className="mt-3">
           <Form.Label>Categoria</Form.Label>
-
           <Form.Select name="category" size="lg" value={form.category} onChange={handleInputChange}>
             <option value="">--- Seleziona una categoria ---</option>
             <option value="Categoria 1">Categoria 1</option>
@@ -172,22 +169,7 @@ const NewBlogPost = () => {
         </Form.Group>
 
         <Form.Group className="mt-3">
-          <Form.Label>Autore</Form.Label>
-
-          <Form.Control
-            name="author"
-            type="email"
-            size="lg"
-            placeholder="m.rossi@domain.com"
-            value={form.author}
-            onChange={handleInputChange}
-            required
-          />
-        </Form.Group>
-
-        <Form.Group className="mt-3">
           <Form.Label>Copertina</Form.Label>
-
           <Form.Control type="file" size="lg" accept="image/*" onChange={handleCoverChange} />
         </Form.Group>
 
@@ -199,7 +181,6 @@ const NewBlogPost = () => {
               name="value"
               size="lg"
               type="number"
-              placeholder="10"
               min={0}
               value={form.readTime.value}
               onChange={handleReadTimeChange}
@@ -214,7 +195,6 @@ const NewBlogPost = () => {
 
         <Form.Group className="mt-3">
           <Form.Label>Contenuto Blog</Form.Label>
-
           <Editor content={form.content} setContent={handleEditorChange} />
         </Form.Group>
 
@@ -225,6 +205,7 @@ const NewBlogPost = () => {
             variant="outline-dark"
             onClick={() => {
               setForm(initialFormState)
+              setCoverFile(null)
               resetMessages()
             }}
           >

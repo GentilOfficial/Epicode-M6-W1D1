@@ -4,8 +4,11 @@ import './styles.css'
 const BlogAuthor = ({ author }) => {
   return (
     <Row>
-      <Col>
-        <small>{author}</small>
+      <Col className="d-flex gap-2 align-items-center">
+        <img src={author.avatar} alt={`${author.name} ${author.surname}`} className="blog-author rounded-circle" />
+        <small>
+          {author.name} {author.surname}
+        </small>
       </Col>
     </Row>
   )

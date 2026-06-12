@@ -2,6 +2,7 @@ const authorsService = require('./authors.service')
 const sendEmail = require('../email/index')
 const HttpException = require('../../exceptions')
 const { uploadToCloudinary } = require('../../middlewares/multer')
+const { generateJWT } = require('../auth/auth.service')
 
 const getAuthors = async (req, res, next) => {
   try {
@@ -92,9 +93,11 @@ const createAuthor = async (req, res, next) => {
     const { body } = req
     const author = await authorsService.createAuthor(body)
 
+    const token = generateJWT(author)
+
     const emailErrors = await sendEmail(author.email, 'Welcome onboard!', `Welcome ${author.name}!`)
 
-    res.status(201).send({ email: emailErrors || 'Email sent successfully', author })
+    res.status(201).send({ email: emailErrors || 'Email sent successfully', author, token })
   } catch (e) {
     next(e)
   }

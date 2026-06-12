@@ -1,8 +1,12 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Button, Container, Form } from 'react-bootstrap'
+import { useNavigate } from 'react-router'
+import { AuthContext } from '../../providers/AuthenticationProvider'
 import './styles.css'
 
 const Home = (props) => {
+  const { isAuthenticated, login } = useContext(AuthContext)
+  const navigate = useNavigate()
   const [form, setForm] = useState({
     email: null,
     password: null,
@@ -10,8 +14,7 @@ const Home = (props) => {
 
   const tryLogin = async () => {
     try {
-      console.log(form)
-      const response = await fetch('http://localhost:4545/login', {
+      const rawResponse = await fetch(`${import.meta.env.VITE_API_SERVER}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -19,9 +22,13 @@ const Home = (props) => {
         body: JSON.stringify(form),
       })
 
-      const token = await response.json()
+      const response = await rawResponse.json()
 
-      console.log(token)
+      if (!response.token) {
+        throw new Error('Invalid credentials')
+      }
+
+      login(response.token)
     } catch (e) {
       console.error(e)
     }

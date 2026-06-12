@@ -23,7 +23,7 @@ blogPosts.put(
 )
 blogPosts.put(
   '/:id/cover',
-  [checkBlogPostOwner, checkBlogPostExists, uploadToBuffer.single('cover')],
+  [checkBlogPostExists, checkBlogPostOwner, uploadToBuffer.single('cover')],
   blogPostsController.uploadBlogPostCover,
 )
 blogPosts.delete('/:id', [checkBlogPostExists, checkBlogPostOwner], blogPostsController.deleteBlogPostById)
