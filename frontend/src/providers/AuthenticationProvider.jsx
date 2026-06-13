@@ -10,28 +10,11 @@ const AuthenticationProvider = ({ children }) => {
   const isTokenValid = (jwt) => {
     try {
       const decoded = jwtDecode(jwt)
-
       if (!decoded.exp) return false
-
       return decoded.exp * 1000 > Date.now()
     } catch {
       return false
     }
-  }
-
-  const login = (jwt) => {
-    if (!isTokenValid(jwt)) {
-      logout()
-      return false
-    }
-
-    const decoded = jwtDecode(jwt)
-
-    setToken(jwt)
-    setUser(decoded)
-    localStorage.setItem('token', jwt)
-
-    return true
   }
 
   const logout = () => {
@@ -40,37 +23,43 @@ const AuthenticationProvider = ({ children }) => {
     localStorage.removeItem('token')
   }
 
-  const initAuth = async () => {
-    const savedToken = localStorage.getItem('token')
-
-    if (!savedToken) return
-
-    if (!isTokenValid(savedToken)) {
+  const loadUserFromToken = async (jwt) => {
+    if (!isTokenValid(jwt)) {
       logout()
-      return
+      return false
     }
-
-    const decoded = jwtDecode(savedToken)
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_SERVER}/me`, {
         headers: {
-          Authorization: savedToken,
+          Authorization: jwt,
         },
       })
 
-      if (!response.ok) {
-        throw new Error()
-      }
+      if (!response.ok) throw new Error()
 
       const { author } = await response.json()
 
       setUser(author)
+      setToken(jwt)
+      localStorage.setItem('token', jwt)
+
+      return true
     } catch (e) {
       logout()
+      return false
     }
+  }
 
-    setToken(savedToken)
+  const login = async (jwt) => {
+    return await loadUserFromToken(jwt)
+  }
+
+  const initAuth = async () => {
+    const savedToken = localStorage.getItem('token')
+    if (!savedToken) return
+
+    await loadUserFromToken(savedToken)
   }
 
   useEffect(() => {
@@ -81,7 +70,6 @@ const AuthenticationProvider = ({ children }) => {
     if (!token) return
 
     const decoded = jwtDecode(token)
-
     const expiresIn = decoded.exp * 1000 - Date.now()
 
     if (expiresIn <= 0) {
@@ -90,7 +78,6 @@ const AuthenticationProvider = ({ children }) => {
     }
 
     const timeout = setTimeout(logout, expiresIn)
-
     return () => clearTimeout(timeout)
   }, [token])
 
