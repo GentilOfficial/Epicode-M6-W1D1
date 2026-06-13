@@ -5,7 +5,7 @@ import Pagination from '../../pagination/Pagination'
 import BlogItem from '../blog-item/BlogItem'
 
 const BlogList = () => {
-  const { token } = useContext(AuthContext)
+  const { token, logout } = useContext(AuthContext)
 
   const [posts, setPosts] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
@@ -32,6 +32,11 @@ const BlogList = () => {
           headers: { Authorization: token },
         },
       )
+
+      if (res.status === 401) {
+        logout()
+        throw new Error('Sessione scaduta')
+      }
 
       if (!res.ok) {
         throw new Error(`HTTP error ${res.status}`)

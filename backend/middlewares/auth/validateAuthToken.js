@@ -2,10 +2,15 @@ const jwt = require('jsonwebtoken')
 const HttpException = require('../../exceptions')
 require('dotenv').config()
 
-const publicRoutes = ['/login']
+const publicRoutes = [
+  { path: '/login', method: 'POST' },
+  { path: '/authors', method: 'POST' },
+]
 
 const validateAuthToken = async (req, res, next) => {
-  if (publicRoutes.includes(req.path)) return next()
+  const isPublicRoute = publicRoutes.some((route) => route.path === req.path && route.method === req.method)
+
+  if (isPublicRoute) return next()
 
   try {
     const token = req.headers['authorization']

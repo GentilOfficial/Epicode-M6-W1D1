@@ -7,17 +7,31 @@ const AuthenticationProvider = ({ children }) => {
   const [token, setToken] = useState(null)
   const [user, setUser] = useState(null)
 
-  const login = (jwt) => {
+  const isTokenValid = (jwt) => {
     try {
       const decoded = jwtDecode(jwt)
 
-      setToken(jwt)
-      setUser(decoded)
-      localStorage.setItem('token', jwt)
-    } catch (e) {
-      console.error('Invalid token:', e)
-      logout()
+      if (!decoded.exp) return false
+
+      return decoded.exp * 1000 > Date.now()
+    } catch {
+      return false
     }
+  }
+
+  const login = (jwt) => {
+    if (!isTokenValid(jwt)) {
+      logout()
+      return false
+    }
+
+    const decoded = jwtDecode(jwt)
+
+    setToken(jwt)
+    setUser(decoded)
+    localStorage.setItem('token', jwt)
+
+    return true
   }
 
   const logout = () => {
@@ -28,23 +42,36 @@ const AuthenticationProvider = ({ children }) => {
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token')
+
     if (!savedToken) return
 
-    try {
-      const decoded = jwtDecode(savedToken)
-
-      if (decoded.exp * 1000 < Date.now()) {
-        logout()
-        return
-      }
-
-      setToken(savedToken)
-      setUser(decoded)
-    } catch (e) {
-      console.error('Invalid stored token:', e)
+    if (!isTokenValid(savedToken)) {
       logout()
+      return
     }
+
+    const decoded = jwtDecode(savedToken)
+
+    setToken(savedToken)
+    setUser(decoded)
   }, [])
+
+  useEffect(() => {
+    if (!token) return
+
+    const decoded = jwtDecode(token)
+
+    const expiresIn = decoded.exp * 1000 - Date.now()
+
+    if (expiresIn <= 0) {
+      logout()
+      return
+    }
+
+    const timeout = setTimeout(logout, expiresIn)
+
+    return () => clearTimeout(timeout)
+  }, [token])
 
   return (
     <AuthContext.Provider

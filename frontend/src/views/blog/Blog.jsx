@@ -7,7 +7,7 @@ import { AuthContext } from '../../providers/AuthenticationProvider'
 import './styles.css'
 
 const Blog = () => {
-  const { token } = useContext(AuthContext)
+  const { token, logout } = useContext(AuthContext)
   const [blog, setBlog] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -28,6 +28,11 @@ const Blog = () => {
             Authorization: token,
           },
         })
+
+        if (res.status === 401) {
+          logout()
+          throw new Error('Sessione scaduta')
+        }
 
         if (res.status === 404) {
           navigate('/404')

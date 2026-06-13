@@ -15,7 +15,7 @@ const initialFormState = {
 }
 
 const NewBlogPost = () => {
-  const { token } = useContext(AuthContext)
+  const { token, logout } = useContext(AuthContext)
   const [form, setForm] = useState(initialFormState)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -100,6 +100,11 @@ const NewBlogPost = () => {
         body: JSON.stringify(form),
       })
 
+      if (res.status === 401) {
+        logout()
+        throw new Error('Sessione scaduta')
+      }
+
       if (!response.ok) {
         throw new Error('Errore durante la creazione del post')
       }
@@ -117,6 +122,11 @@ const NewBlogPost = () => {
           },
           body: formData,
         })
+
+        if (uploadResponse.status === 401) {
+          logout()
+          throw new Error('Sessione scaduta')
+        }
 
         if (!uploadResponse.ok) {
           throw new Error("Errore durante l'upload della copertina")
