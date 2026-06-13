@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react'
 import { Alert, Badge, Container, Image, Spinner } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router'
 import BlogAuthor from '../../components/blog/blog-author/BlogAuthor'
-import BlogLike from '../../components/likes/BlogLike'
+import CommentList from '../../components/blog/comments/comment-list/CommentList'
 import { AuthContext } from '../../providers/AuthenticationProvider'
 import './styles.css'
 
@@ -25,6 +25,7 @@ const Blog = () => {
 
         const res = await fetch(`${import.meta.env.VITE_API_SERVER}/blogPosts/${id}`, {
           headers: {
+            'Content-Type': 'application/json',
             Authorization: token,
           },
         })
@@ -100,10 +101,6 @@ const Blog = () => {
             <div>
               lettura da {blog.readTime?.value} {blog.readTime?.unit}
             </div>
-
-            <div style={{ marginTop: 20 }}>
-              <BlogLike defaultLikes={['123', '456', '789', '101']} onChange={console.log} />
-            </div>
           </div>
         </div>
 
@@ -112,6 +109,10 @@ const Blog = () => {
             __html: blog.content,
           }}
         />
+
+        <div className="row mt-5">
+          <CommentList postId={params.id} />
+        </div>
       </Container>
     </div>
   )

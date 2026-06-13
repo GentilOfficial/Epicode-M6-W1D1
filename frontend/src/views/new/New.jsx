@@ -100,7 +100,7 @@ const NewBlogPost = () => {
         body: JSON.stringify(form),
       })
 
-      if (res.status === 401) {
+      if (response.status === 401) {
         logout()
         throw new Error('Sessione scaduta')
       }
