@@ -2,6 +2,7 @@ const AuthorsSchema = require('./authors.schema')
 const BlogPostsSchema = require('../blogPosts/blogPosts.schema')
 const CommentsSchema = require('../comments/comments.schema')
 const paginateResponse = require('../../config/pagination')
+const { removeFromCloudinary } = require('../../middlewares/multer')
 
 const getAuthors = async (currentPage, pageSize) => {
   const [authors, totalAuthors] = await Promise.all([
@@ -27,7 +28,14 @@ const deleteAuthorById = async (id) => {
 
   if (!deletedAuthor) return null
 
-  const blogPostIds = await BlogPostsSchema.distinct('_id', { author: deletedAuthor._id })
+  const authorBlogPosts = await BlogPostsSchema.find({ author: deletedAuthor._id }, '_id cover').lean()
+  const blogPostIds = authorBlogPosts.map((blogPost) => blogPost._id)
+  const blogPostCovers = authorBlogPosts.map((blogPost) => blogPost.cover)
+
+  await Promise.all([
+    ...blogPostCovers.map((url) => removeFromCloudinary(url)),
+    removeFromCloudinary(deletedAuthor.avatar),
+  ])
 
   const [deletedBlogPosts, deletedComments] = await Promise.all([
     BlogPostsSchema.deleteMany({

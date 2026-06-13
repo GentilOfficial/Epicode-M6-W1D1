@@ -22,4 +22,22 @@ const uploadToCloudinary = (buffer, options) => {
   })
 }
 
-module.exports = { uploadToBuffer, uploadToCloudinary }
+const getPublicIdFromUrl = (url) => {
+  if (!url.includes('res.cloudinary.com')) return null
+  const parts = url.split('/')
+  const fileWithExt = parts.pop()
+  const folder = parts.slice(parts.indexOf('upload') + 2).join('/')
+  return `${folder}/${fileWithExt.split('.')[0]}`
+}
+
+const removeFromCloudinary = async (url) => {
+  const publicId = getPublicIdFromUrl(url)
+
+  if (publicId) {
+    await cloudinary.uploader.destroy(publicId, {
+      resource_type: 'image',
+    })
+  }
+}
+
+module.exports = { uploadToBuffer, uploadToCloudinary, removeFromCloudinary }

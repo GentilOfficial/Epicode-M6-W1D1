@@ -1,6 +1,7 @@
 const BlogPostsSchema = require('./blogPosts.schema')
 const CommentsSchema = require('../comments/comments.schema')
 const paginateResponse = require('../../config/pagination')
+const { removeFromCloudinary } = require('../../middlewares/multer')
 
 const getBlogPosts = async (title = '', currentPage, pageSize) => {
   const [blogPosts, totalBlogPosts] = await Promise.all([
@@ -30,6 +31,8 @@ const deleteBlogPostById = async (id) => {
   const deletedBlogPost = await BlogPostsSchema.findByIdAndDelete(id).lean()
 
   if (!deletedBlogPost) return null
+
+  await removeFromCloudinary(deletedBlogPost.cover)
 
   const deletedComments = await CommentsSchema.deleteMany({ blogPost: deletedBlogPost._id })
 

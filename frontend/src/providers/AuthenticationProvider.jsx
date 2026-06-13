@@ -40,7 +40,7 @@ const AuthenticationProvider = ({ children }) => {
     localStorage.removeItem('token')
   }
 
-  useEffect(() => {
+  const initAuth = async () => {
     const savedToken = localStorage.getItem('token')
 
     if (!savedToken) return
@@ -52,8 +52,29 @@ const AuthenticationProvider = ({ children }) => {
 
     const decoded = jwtDecode(savedToken)
 
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_SERVER}/me`, {
+        headers: {
+          Authorization: savedToken,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error()
+      }
+
+      const { author } = await response.json()
+
+      setUser(author)
+    } catch (e) {
+      logout()
+    }
+
     setToken(savedToken)
-    setUser(decoded)
+  }
+
+  useEffect(() => {
+    initAuth()
   }, [])
 
   useEffect(() => {

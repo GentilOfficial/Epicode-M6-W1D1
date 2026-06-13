@@ -2,6 +2,7 @@ import { Col, Row } from 'react-bootstrap'
 import './styles.css'
 
 const BlogAuthor = ({ author }) => {
+  if (!author) return null
   return (
     <Row>
       <Col className="d-flex gap-2 align-items-center">
