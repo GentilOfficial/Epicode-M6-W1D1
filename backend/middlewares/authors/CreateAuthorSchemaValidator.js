@@ -36,11 +36,7 @@ const createAuthorValidationSchema = [
     .withMessage(
       'Password must be at least 12 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one symbol',
     ),
-  body('birthday')
-    .notEmpty()
-    .withMessage('Required birthday field')
-    .isDate()
-    .withMessage('Birthday field must be a valid date'),
+  body('birthday').optional().isDate().withMessage('Birthday field must be a valid date'),
   body('avatar').optional().isURL().withMessage('Avatar must be a valid url'),
 ]
 

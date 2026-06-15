@@ -5,6 +5,8 @@ require('dotenv').config()
 const publicRoutes = [
   { path: '/login', method: 'POST' },
   { path: '/authors', method: 'POST' },
+  { path: '/login/google', method: 'GET' },
+  { path: '/login/google/callback', method: 'GET' },
 ]
 
 const validateAuthToken = async (req, res, next) => {

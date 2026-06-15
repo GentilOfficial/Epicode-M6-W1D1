@@ -29,12 +29,14 @@ const AuthorSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return !this.googleId
+      },
       minlength: 12,
     },
+    googleId: { type: String },
     birthday: {
       type: Date,
-      required: true,
     },
     avatar: {
       type: String,

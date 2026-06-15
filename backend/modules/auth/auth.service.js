@@ -20,7 +20,7 @@ const generateJWT = (user) => {
 const login = async (email, password) => {
   const author = await AuthorsSchema.findOne({ email })
 
-  if (!author) return null
+  if (!author || !password || !author.password) return null
 
   const passwordVerified = await bcrypt.compare(password, author.password)
 

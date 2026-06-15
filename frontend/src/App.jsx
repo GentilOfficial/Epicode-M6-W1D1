@@ -8,6 +8,7 @@ import Signup from './views/auth/Signup'
 import Blog from './views/blog/Blog'
 import Home from './views/home/Home'
 import NewBlogPost from './views/new/New'
+import OAuth from './views/oauth/OAuth'
 
 const App = () => {
   return (
@@ -23,8 +24,9 @@ const App = () => {
                 <Route path="/new" element={<NewBlogPost />} />
               </Route>
               <Route element={<PrivateRoute type="auth" />}>
-                <Route path="/login" exact element={<Login />} />
+                <Route index path="/login" exact element={<Login />} />
                 <Route path="/signup" exact element={<Signup />} />
+                <Route path="/login/oauth" exact element={<OAuth />} />
               </Route>
             </Routes>
           </div>

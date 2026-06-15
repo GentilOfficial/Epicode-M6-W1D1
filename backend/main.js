@@ -8,6 +8,7 @@ const authorsRoutes = require('./modules/authors/authors.routes')
 const blogPostsRoutes = require('./modules/blogPosts/blogPosts.routes')
 const commentsRoutes = require('./modules/comments/comments.routes')
 const authRoutes = require('./modules/auth/auth.routes')
+const oauthRoutes = require('./modules/auth/oauth/oauth.routes')
 
 // middlewares
 const logger = require('./middlewares/logger')
@@ -27,6 +28,7 @@ server.use(logger)
 server.use(validateAuthToken)
 
 server.use('/', authRoutes)
+server.use('/', oauthRoutes)
 server.use('/authors', authorsRoutes)
 server.use('/blogPosts', blogPostsRoutes)
 server.use('/blogPosts', commentsRoutes)

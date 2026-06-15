@@ -66,6 +66,14 @@ const getAuthorBlogPosts = async (id, currentPage, pageSize) => {
   return paginateResponse(currentPage, pageSize, totalAuthorBlogPosts, blogPosts)
 }
 
+const findByGoogleIdOrCreate = async (googleId, authorPayload) => {
+  const author = await AuthorsSchema.findOne({ googleId })
+  if (!author) {
+    return await createAuthor(authorPayload)
+  }
+  return author
+}
+
 module.exports = {
   getAuthors,
   getAuthorById,
@@ -73,4 +81,5 @@ module.exports = {
   deleteAuthorById,
   createAuthor,
   getAuthorBlogPosts,
+  findByGoogleIdOrCreate,
 }
