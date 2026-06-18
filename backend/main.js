@@ -16,7 +16,7 @@ const validateAuthToken = require('./middlewares/auth/validateAuthToken')
 const errorHandler = require('./middlewares/errorHandler')
 
 // server configs
-const SERVER_PORT = 4545
+const SERVER_PORT = process.env.PORT
 const MONGODB_CONNECTION_STRING = process.env.MONGODB_CONNECTION_STRING
 
 const server = express()
